@@ -19,8 +19,10 @@ class User(BaseModel):
 def get_all(request: Request) -> HTMLResponse:
     return templates.TemplateResponse('users.html', {'request': request, 'users': users})
 @app.get(path='/user/{user_id}', response_class=HTMLResponse)
-async def get_users(request: Request, user_id =  int) -> HTMLResponse:
-    if user_id < 0 or user_id >= len(users):
+
+async def get_users(request: Request, user_id: Annotated[int, Path(ge= 1)]) -> HTMLResponse:
+    user = next((user for user in users if user.id == user_id), None)
+    if not user:
         raise HTTPException(status_code= 404, detail='User not found')
     return templates.TemplateResponse('users.html', {'request': request, 'user': users[user_id - 1]})
 
